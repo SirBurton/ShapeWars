@@ -1,6 +1,7 @@
 # Quick trading game
 # November 2020
 # Sir Aaron Burton
+# Copyright - Please give me credit if you use this.
 
 import time, random
 
@@ -288,6 +289,7 @@ def randomEvents():
                   "The %s's government has subsidized the %s" %(worlds[loc].title(),item[:-1]),
                   "%s says %s aren't cool" %(random.choice(['Bob Ross','John Cena','Steve']),item),
                   "%s spotted on a stale meme" %(item[:-1].capitalize()),
+                  "For no reason at all"
                   ]
         print("%s, %s price drops." %(random.choice(things),item))
         which = items.index(item)
@@ -301,11 +303,11 @@ def randomEvents():
     elif event >= 0.6:
         #Space Pirates, give shapes or monies?
         spacePirates()
-    elif event >= 0.5:
-        #tax collector
-        #loose some percent of your inventory
-        #similar to pirates, but less harsh
-        pass
+    elif event >= 0.55:
+        #Worm Hole
+        print("You got sucked into a wormhole,")
+        loc = random.choice(0,len(worlds-1))
+        print("you have arrived at %s." %(worlds[loc]))
     elif event >= 0.4:
         print("A traveling merchant offeres to work on your ship.")
         upgrade()
