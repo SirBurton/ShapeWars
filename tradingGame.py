@@ -306,7 +306,7 @@ def randomEvents():
     elif event >= 0.55:
         #Worm Hole
         print("You got sucked into a wormhole,")
-        loc = random.choice(0,len(worlds-1))
+        loc = random.choice(0,len(worlds)-1)
         print("you have arrived at %s." %(worlds[loc]))
     elif event >= 0.4:
         print("A traveling merchant offeres to work on your ship.")
@@ -368,6 +368,8 @@ def spacePirates():
 while day <= 30:
     print()
     print('Day',day,'on',worlds[loc].title())
+    print('You have $%.2f monies.' %(monies))
+    print()
     showPrices()
     #time.sleep(1) 
     #buy/sell stuff
