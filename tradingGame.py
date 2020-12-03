@@ -306,7 +306,7 @@ def randomEvents():
     elif event >= 0.55:
         #Worm Hole
         print("You got sucked into a wormhole,")
-        loc = random.choice(0,len(worlds)-1)
+        loc = random.randint(0,len(worlds)-1)
         print("you have arrived at %s." %(worlds[loc]))
     elif event >= 0.4:
         print("A traveling merchant offeres to work on your ship.")
