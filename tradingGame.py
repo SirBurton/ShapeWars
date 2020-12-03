@@ -1,9 +1,9 @@
 # Quick trading game
-# v0.2.3
+# v0.2.4
 # Sir Aaron Burton
 # Copyright - Please give me credit if you use this.
 
-import time, random
+import time, random, hashlib
 
 #Player stuff
 inv = []  #inventory (empty at first)
@@ -365,7 +365,15 @@ def spacePirates():
         upgrades.append('brokenEngine')
         hp -= 1
         monies /= 2
-        
+
+#This is for validating the game file.
+#The game was designed to be open-source, but keeping track of scores
+#needs to be from the same source to be fair.
+def getHash():
+    with open(__file__,'rb') as f:
+        f = f.read()
+        result = hashlib.md5(f)
+        return result.hexdigest()
 
 while day <= 30:
     print()
