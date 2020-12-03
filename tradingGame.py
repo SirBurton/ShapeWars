@@ -120,7 +120,7 @@ def sell():
     print(" 0) Nevermind")
     choice = numberInput()
     print()
-    if choice == 0: return
+    if choice == 0 or choice > len(items): return
     print("How many %s would you like to sell?" %(items[choice-1]))
     sale = numberInput()
     if sale > inv.count(items[choice-1]):
