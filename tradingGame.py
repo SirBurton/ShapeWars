@@ -1,5 +1,5 @@
 # Quick trading game
-# November 2020
+# v0.2.3
 # Sir Aaron Burton
 # Copyright - Please give me credit if you use this.
 
@@ -10,6 +10,7 @@ inv = []  #inventory (empty at first)
 hp = 10   #health (doesn't do anything yet)
 monies = 1000
 upgrades = []
+moniesHistory = []  #track the players worth over the game (not used yet)
 
 #World stuff
 worlds = ['earth','pluto','saturn',
@@ -75,6 +76,7 @@ def showPrices():
     for i in range(len(items)):
         print('$%7.2f %s' %(prices[i],items[i].title()))
     print()
+
 
 def buy():
     #global means to use the variables defined before the function in the function.
@@ -232,7 +234,7 @@ def travel():
     return worlds.index(goto)
 
 def menu():
-    global loc
+    global loc, monies
     print(' 1) View Inventory')
     print(' 2) Buy Shapes')
     print(' 3) Sell Shapes')
@@ -251,6 +253,7 @@ def menu():
     elif option == 0:
         old = loc
         loc = travel()
+        moniesHistory.append(monies)
         if old != loc:
             generatePrices()
         else:
@@ -259,7 +262,6 @@ def menu():
     elif option == 4 and loc in shops:
         upgrade()
     elif option == 42:
-        global monies
         monies += 10000
     elif option == 333:
         global day
