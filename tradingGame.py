@@ -11,6 +11,7 @@ hp = 10   #health (doesn't do anything yet)
 monies = 1000
 upgrades = []
 moniesHistory = []  #track the players worth over the game (not used yet)
+invHistory = []
 
 #World stuff
 worlds = ['earth','pluto','saturn',
@@ -254,6 +255,7 @@ def menu():
         old = loc
         loc = travel()
         moniesHistory.append(monies)
+        invHistory.append(invValue())
         if old != loc:
             generatePrices()
         else:
@@ -365,6 +367,15 @@ def spacePirates():
         upgrades.append('brokenEngine')
         hp -= 1
         monies /= 2
+
+#Convert inventory to value on current planet at current prices
+#This is for information and making cool graphs later
+def invValue():
+    global prices,inv,items
+    total = 0
+    for i in range(len(items)):
+        total += prices[i] * inv.count(items[i])
+    return total
 
 #This is for validating the game file.
 #The game was designed to be open-source, but keeping track of scores
