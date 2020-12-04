@@ -1,5 +1,5 @@
 # Quick trading game
-# v0.2.4
+# v0.2.5
 # Sir Aaron Burton
 # Copyright - Please give me credit if you use this.
 
@@ -18,7 +18,7 @@ worlds = ['earth','pluto','saturn',
           'forrest moon of endor','alderaan','mustafar','hoth','dagobah','naboo','coruscant','tatooine','kashyyyk',
           'pandora','vulcan','deep space 9','krypton','scadrial','reach','harvest','onyx',
           'raxacoricofallapatorius','apalapucia',"demon's run",'skaro',
-          'gargantua','cooper station','miller','edmunds'
+          'gargantua','cooper station','miller','edmunds',
           'gallifrey','sontar','trenzalore',
           'typhon','terra 2','harmony','hollow bastion','nobook',
           'ego','vormir','xandar','sakaar','asgard','nidavellir',
@@ -386,6 +386,32 @@ def getHash():
         result = hashlib.md5(f)
         return result.hexdigest()
 
+#Draw a text based graph of your monies history
+def drawGraph(tall=10):
+    liquid = [moniesHistory[i] + invHistory[i] for i in range(len(invHistory))]
+    row = [' ']*33
+    graph = []
+    for i in range(tall+2):
+        graph.append(row[:])
+
+    for row in graph:
+        row[1] = '|'
+
+    for i in range(len(liquid)):
+        height = int((tall*moniesHistory[i])//max(liquid))
+        graph[tall-height][i+2] = '$'
+        height = int((tall*invHistory[i])//max(liquid))
+        graph[tall-height][i+2] = 'I'
+        height = int((tall*liquid[i])//max(liquid))
+        graph[tall-height][i+2] = '*'
+        graph[tall+1][i+2] = '_'
+
+    graph[0].append('$%.2f' %(max(liquid)))
+
+    for row in graph:
+        print(''.join(row))
+
+
 while day <= 30:
     print()
     print('Day',day,'on',worlds[loc].title())
@@ -395,6 +421,7 @@ while day <= 30:
     #time.sleep(1) 
     #buy/sell stuff
     option = menu()
-        
+
+drawGraph(15)        
 print("You have run out of day.")
 print("You have $%.2f" %(monies))
