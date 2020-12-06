@@ -1,5 +1,5 @@
 # Quick trading game
-# v0.2.6
+# v0.2.7
 # Sir Aaron Burton
 # Copyright - Please give me credit if you use this.
 
@@ -10,12 +10,12 @@ inv = []  #inventory (empty at first)
 hp = 10   #health (doesn't do anything yet)
 monies = 1000
 upgrades = []
-moniesHistory = []  #track the players worth over the game (not used yet)
-invHistory = []
+moniesHistory = []  #track the players worth over the game (for end game graph)
+invHistory = []     #track the value of their inventory
 
 #World stuff
 worlds = ['earth','pluto','saturn',
-          'forrest moon of endor','alderaan','mustafar','hoth','dagobah','naboo','coruscant','tatooine','kashyyyk',
+          'forest moon of endor','alderaan','mustafar','hoth','dagobah','naboo','coruscant','tatooine','kashyyyk',
           'pandora','vulcan','deep space 9','krypton','scadrial','reach','harvest','onyx',
           'raxacoricofallapatorius','apalapucia',"demon's run",'skaro',
           'gargantua','cooper station','miller','edmunds',
@@ -78,12 +78,14 @@ def showPrices():
         print('$%7.2f %s' %(prices[i],items[i].title()))
     print()
 
+def storageSpace():
+    return (100 + 100 * upgrades.count('cargo')) * (1 + 0.2 * upgrades.count('expandedCargo'))
 
 def buy():
     #global means to use the variables defined before the function in the function.
     #It isn't always the best way to do it, but it is typicaly a quick solution.
     global monies, inv
-    storage = 100 + 100 * upgrades.count('cargo')
+    storage = storageSpace()
     print("What would you like to buy?")
     print("You have $%.2f monies." %(monies))
     for i in range(len(items)):
@@ -189,7 +191,7 @@ def upgrade():
         if monies >= storage:
             upgrades.append('cargo')
             monies = monies - storage
-            print("Cargo Bay Expanded!")
+            print("Cargo Bay Expanded to %i!" %(storageSpace()))
         else:
             print("You do not have enough monies.")
     elif choice == 3:
@@ -277,16 +279,27 @@ def randomEvents():
     global prices, monies, inv, loc, worlds
     event = random.random()
     item = random.choice(items)
+    #rare events come first, the low end of the random
     if event <= 0.07:
         #find random items  (less when the item is more expensive)
         quantity = random.randint(1,(6-items.index(item))*3)
-        storage = 100 + 100 * upgrades.count('cargo')
+        storage = storageSpace()
         print("You found %i random %s floating in space!" %(quantity,item))
         if len(inv)+quantity > storage:
             quantity = storage-len(inv)
             print("However, your inventory is too full, so you could only collect %i." %(quantity))
         for i in range(quantity):
             inv.append(item)
+    elif event <= 0.11:
+        #Worm Hole
+        print("You got sucked into a wormhole,")
+        loc = worlds.index(random.choice(worlds))
+        #loc = random.randint(0,len(worlds)-1)
+        print("you have arrived at %s." %(worlds[loc]))
+    elif event <= 0.15:
+        #Distress signal
+        distressSignal()
+    #more common events down here
     elif event >= 0.8:
         #price drop
         things = ["The %s miners worked extra hard" %(item),
@@ -307,16 +320,58 @@ def randomEvents():
     elif event >= 0.6:
         #Space Pirates, give shapes or monies?
         spacePirates()
-    elif event >= 0.55:
-        #Worm Hole
-        print("You got sucked into a wormhole,")
-        loc = random.randint(0,len(worlds)-1)
-        print("you have arrived at %s." %(worlds[loc]))
-    elif event >= 0.4:
+    elif event >= 0.5:
         print("A traveling merchant offeres to work on your ship.")
         upgrade()
     #add more events later
     #include at least one that give you things
+
+def distressSignal():
+    print("You received a distress signal.")
+    print(" 1) Follow it")
+    print(" 2) Ignore it")
+    choice = numberInput()
+    if choice == 1:
+        print('You follow the distress signal, trying to help someone in need.')
+        if random.random() < 0.33:
+            spacePirates()
+            # They were space pirates in disguise!
+            return
+        print("It looks like they have run out of Engine Juice.")
+        # Add more random things they could have problems with
+        print(" 1) Offer some of yours")
+        print(" 2) Inquire about their mission")
+        print(" 3) Peek at their inventory")
+        print(" 4) Attack their ship")
+        print(" 0) Abandon the needy")
+        choice = numberInput()
+        if choice == 1:
+            print("They graciously accept your offer!")
+            print("Now a fully functioning ship again, they want to return the favor.")
+            print("Their ship mechanic has new technology to expand your inventory by 20%")
+            print("They install it on your ship.  Its super effective!")
+            upgrades.append('expandedCargo')
+        elif choice == 2:
+            print("They begin some long winded explanation about galactic peace and whatnot.")
+            print("You leave while they are still talking.")
+            #Do something more with this
+        elif choice == 3:
+            print("Whoa!  They get quite offended that you are looking at their stash.")
+            #Random options
+            #It is huge!
+            #It is pathetic
+        elif choice == 4:
+            print('attack!')
+            if fight():
+                print('You win, loot their ship')
+            else:
+                print('You lost, to a distressed ship.')
+        else:
+            print("You shamefully fly away.")
+    else:
+        print("You ignore the distress signal.")
+        print("Hopefully they will be ok.")
+
 
 def spacePirates():
     global monies, inv, hp
@@ -346,14 +401,17 @@ def spacePirates():
     elif choice == 3:
         # Weapons come in to play here
         # earn something for winning the fight
-        print("You have nothing to fight with.")
-        print("They take half of your inventory for trying.")
-        pirates = inv[:len(inv)//2] #pirates get the first half
-        inv = inv[len(inv)//2:] #You get the second half
-        #show what they took
-        print("They took")
-        for item in items:
-            print('%3i: %s' %(pirates.count(item), item.title()))
+        if fight():
+            print('You win the fight!')
+            return
+        else:
+            print("They take half of your inventory for trying.")
+            pirates = inv[:len(inv)//2] #pirates get the first half
+            inv = inv[len(inv)//2:] #You get the second half
+            #show what they took
+            print("They took")
+            for item in items:
+                print('%3i: %s' %(pirates.count(item), item.title()))
     #elif choice == 4:
     else:
         if upgrades.count('engine') >= random.randint(0,3):
@@ -367,6 +425,20 @@ def spacePirates():
         upgrades.append('brokenEngine')
         hp -= 1
         monies /= 2
+
+#make a figh function
+def fight():
+    # Enemy ship has a random weapon quantity
+    # Continue firing back and forth until someone runs out or looses all HP
+    # Most shots do 1 damage.  Some can do 2, some 3
+    # Shields block the shot.
+    # Return True for victory, False for Defeat
+    # (For now, you win if you have any weapons)
+    if upgrades.count('weapon'):
+        return True
+    else:
+        print("You have nothing to fight with.")
+    return False
 
 #Convert inventory to value on current planet at current prices
 #This is for information and making cool graphs later
