@@ -1,5 +1,5 @@
 # Quick trading game
-# v0.2.7
+# v0.2.8
 # Sir Aaron Burton
 # Copyright - Please give me credit if you use this.
 
@@ -150,7 +150,8 @@ def upgrade():
     print("What would you like to upgrade?")
     print("You have %.2f monies" %(monies))
     # Engines start at $500, and go up 4x the price each upgrade
-    engine = 500 * (4 ** upgrades.count('engine'))
+    engine = 500 * (3 ** upgrades.count('engine'))
+    if 'brokenEngine' in upgrades: engine = 250
     # Storage always costs $1000
     storage = 1000
     # Shields are cheap at first, and increase exponentially as you get to 100
@@ -158,21 +159,22 @@ def upgrade():
     # This is a silly math equation.
     x = upgrades.count('shield')
     shields = 1000/(99-x) + 10*x
-    
+    # Weapons upgrade similar to engines, but steeper
+    weapons = 1000 * (5 ** upgrades.count('weapon'))
     # If we are not on earth, alter the upgrade cost
     if loc != earth:
         priceScale = 2/max(shops.count(loc),1)
         engine *= priceScale
         storage *= priceScale
         shields *= priceScale
-        #weapons *= priceScale
+        weapons *= priceScale
     if 'brokenEngine' in upgrades:
         print(" 1) Repair Engine \t$%.2f" %(engine))
     else:
         print(" 1) Engine \t$%.2f" %(engine))
     print(" 2) Cargo Bay \t$%.2f" %(storage))
     print(" 3) Shields \t$%.2f" %(shields))
-    # 4) Weapons
+    print(" 4) Weapons \t$%.2f" %(weapons))
     print(" 0) Nevermind")
     
     choice = numberInput()
@@ -201,6 +203,11 @@ def upgrade():
             print("Shields are now %i%% effective!" %(x+1))
         else:
             print("You do not have enough monies.")
+    elif choice == 4:
+        if monies >= weapons:
+            upgrades.append('weapon')
+            monies = monies - weapons
+            print("You now have Level %i Weaponry!" %(upgrades.count('weapon')))
     elif choice == 0:
         return
     else:
@@ -364,8 +371,10 @@ def distressSignal():
             print('attack!')
             if fight():
                 print('You win, loot their ship')
+                print("doesnt work yet")
             else:
                 print('You lost, to a distressed ship.')
+                print("not implemented yet")
         else:
             print("You shamefully fly away.")
     else:
@@ -403,6 +412,10 @@ def spacePirates():
         # earn something for winning the fight
         if fight():
             print('You win the fight!')
+            print("You take their monies.")
+            winnings = 80000//(100*random.random() +8)
+            print("$%.2f" %(winnings))
+            monies += winnings
             return
         else:
             print("They take half of your inventory for trying.")
@@ -435,7 +448,40 @@ def fight():
     # Return True for victory, False for Defeat
     # (For now, you win if you have any weapons)
     if upgrades.count('weapon'):
-        return True
+        print("You engage in an epic battle in which you have no actual control.")
+        time.sleep(1)
+        enemyHP = 5
+        # The enemy has a 2/3 chance to have level 1 weapons.
+        enemyRandom = random.randint(1,9)
+        if enemyRandom <= 6: enemyWeapon = 1
+        elif enemyRandom <= 8: enemyWeapon = 2
+        else: enemyWeapon = 3
+        enemyShield = 3/(100*random.random()+3)
+        print("Wow!  Their shields are %i%% effective!" %(enemyShield*100))
+        time.sleep(1)
+        global hp #bring your current health along for the ride
+        yourWeapon = upgrades.count('weapon')
+        yourShield = upgrades.count('shield')/100
+        print("Both ships fire a volley of shots.")
+        time.sleep(1)
+        while enemyHP > 0 and hp > 0:
+            if random.random() < enemyShield:
+                print("Your shot was blocked by the enemies shield.")
+            else:
+                print("You hit the enemy and did %i damage to their hull." %(yourWeapon))
+                enemyHP -= yourWeapon
+            print("The enemy has %i HP" %(enemyHP))
+            time.sleep(1)
+            if enemyHP <=0: break
+            if random.random() < yourShield:
+                print("The enemies shot was blocked by your shield.")
+            else:
+                print("The enemy hit you and did %i damage to your hull." %(enemyWeapon))
+                hp -= enemyWeapon
+            print("You have %i HP" %(hp))
+            time.sleep(1)
+        if hp > 0:
+            return True
     else:
         print("You have nothing to fight with.")
     return False
@@ -485,6 +531,9 @@ while day <= 30:
     #time.sleep(1) 
     #buy/sell stuff
     option = menu()
+    if hp <= 0:
+        print("Your ship is damaged beyond repair.  You loose.")
+        break
 
 drawGraph(15)        
 print("You have run out of day.")
