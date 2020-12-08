@@ -1,5 +1,5 @@
 # Quick trading game
-# v0.2.8
+# v0.2.9
 # Sir Aaron Burton
 # Copyright - Please give me credit if you use this.
 
@@ -32,7 +32,7 @@ earth = worlds.index('earth') #locate earth
 loc = earth #always start on earth
 # Choose 3 random worlds to have a shop for ship upgrades
 shops = [worlds.index(random.choice(worlds)) for i in range(30)]
-# Include Earth as a "ship upgrade planet
+# Include Earth as a "ship upgrade planet"
 shops.append(earth)
 
 
@@ -302,7 +302,7 @@ def randomEvents():
         print("You got sucked into a wormhole,")
         loc = worlds.index(random.choice(worlds))
         #loc = random.randint(0,len(worlds)-1)
-        print("you have arrived at %s." %(worlds[loc]))
+        print("you have arrived at %s." %(worlds[loc].title()))
     elif event <= 0.15:
         #Distress signal
         distressSignal()
