@@ -3,7 +3,7 @@
 # Sir Aaron Burton
 # Copyright - Please give me credit if you use this.
 
-import time, random, hashlib
+import time, random
 
 #Player stuff
 inv = []  #inventory (empty at first)
@@ -449,14 +449,6 @@ def invValue():
         total += prices[i] * inv.count(items[i])
     return total
 
-#This is for validating the game file.
-#The game was designed to be open-source, but keeping track of scores
-#needs to be from the same source to be fair.
-def getHash():
-    with open(__file__,'rb') as f:
-        f = f.read()
-        result = hashlib.md5(f)
-        return result.hexdigest()
 
 #Draw a text based graph of your monies history
 def drawGraph(tall=10):
