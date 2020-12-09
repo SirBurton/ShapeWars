@@ -1,5 +1,5 @@
 # Quick trading game
-# v0.2.8
+# v0.2.9
 # Sir Aaron Burton
 # Copyright - Please give me credit if you use this.
 
@@ -293,7 +293,7 @@ def randomEvents():
         storage = storageSpace()
         print("You found %i random %s floating in space!" %(quantity,item))
         if len(inv)+quantity > storage:
-            quantity = storage-len(inv)
+            quantity = int(storage-len(inv))
             print("However, your inventory is too full, so you could only collect %i." %(quantity))
         for i in range(quantity):
             inv.append(item)
