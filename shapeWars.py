@@ -1,5 +1,5 @@
 # Quick trading game
-# v0.2.9
+# v0.2.10
 # Sir Aaron Burton
 # Copyright - Please give me credit if you use this.
 
@@ -79,7 +79,7 @@ def showPrices():
     print()
 
 def storageSpace():
-    return (100 + 100 * upgrades.count('cargo')) * (1 + 0.2 * upgrades.count('expandedCargo'))
+    return int((100 + 100 * upgrades.count('cargo')) * (1 + 0.2 * upgrades.count('expandedCargo')))
 
 def buy():
     #global means to use the variables defined before the function in the function.
