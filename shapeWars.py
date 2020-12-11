@@ -340,13 +340,13 @@ def distressSignal():
     choice = numberInput()
     if choice == 1:
         print('You follow the distress signal, trying to help someone in need.')
-        if random.random() < 0.33:
+        if random.random() < 0.3:
+            print("They were Space Pirates in disguise!")
             spacePirates()
-            # They were space pirates in disguise!
             return
-        print("It looks like they have run out of Engine Juice.")
+        print("They need some help repairing a thing on their ship.")
         # Add more random things they could have problems with
-        print(" 1) Offer some of yours")
+        print(" 1) Offer to help")
         print(" 2) Inquire about their mission")
         print(" 3) Peek at their inventory")
         print(" 4) Attack their ship")
@@ -354,6 +354,11 @@ def distressSignal():
         choice = numberInput()
         if choice == 1:
             print("They graciously accept your offer!")
+            time.sleep(1)
+            print("That took 1 day.")
+            time.sleep(1)
+            global day
+            day += 1
             print("Now a fully functioning ship again, they want to return the favor.")
             print("Their ship mechanic has new technology to expand your inventory by 20%")
             print("They install it on your ship.  Its super effective!")
@@ -364,14 +369,20 @@ def distressSignal():
             #Do something more with this
         elif choice == 3:
             print("Whoa!  They get quite offended that you are looking at their stash.")
+            print("eventually this will have some consequences.")
             #Random options
             #It is huge!
             #It is pathetic
         elif choice == 4:
             print('attack!')
             if fight():
+                global monies
                 print('You win, loot their ship')
-                print("doesnt work yet")
+                print('You win the fight!')
+                print("You take their monies.")
+                winnings = loot()
+                print("$%.2f" %(winnings))
+                monies += winnings
             else:
                 print('You lost, to a distressed ship.')
                 print("not implemented yet")
@@ -413,7 +424,7 @@ def spacePirates():
         if fight():
             print('You win the fight!')
             print("You take their monies.")
-            winnings = 80000//(100*random.random() +8)
+            winnings = loot()
             print("$%.2f" %(winnings))
             monies += winnings
             return
@@ -438,6 +449,10 @@ def spacePirates():
         upgrades.append('brokenEngine')
         hp -= 1
         monies /= 2
+
+#How much monies you get when winning a fight
+def loot(level = 1):
+    return winnings = (level * 80000)//(100*random.random() +8)
 
 #make a figh function
 def fight():
