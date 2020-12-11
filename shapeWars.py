@@ -1,5 +1,5 @@
 # Quick trading game
-# v0.2.10
+# v0.2.11
 # Sir Aaron Burton
 # Copyright - Please give me credit if you use this.
 
@@ -208,6 +208,8 @@ def upgrade():
             upgrades.append('weapon')
             monies = monies - weapons
             print("You now have Level %i Weaponry!" %(upgrades.count('weapon')))
+        else:
+            print("You do not have enough monies.")
     elif choice == 0:
         return
     else:
@@ -452,7 +454,7 @@ def spacePirates():
 
 #How much monies you get when winning a fight
 def loot(level = 1):
-    return winnings = (level * 80000)//(100*random.random() +8)
+    return (level * 80000)//(100*random.random() +8)
 
 #make a figh function
 def fight():
