@@ -1,5 +1,5 @@
 # Quick trading game
-# v0.2.9
+# v0.2.10
 # Sir Aaron Burton
 # Copyright - Please give me credit if you use this.
 
@@ -7,7 +7,7 @@ import time, random
 
 #Player stuff
 inv = []  #inventory (empty at first)
-hp = 10   #health (doesn't do anything yet)
+hp = 10   #health
 monies = 1000
 upgrades = []
 moniesHistory = []  #track the players worth over the game (for end game graph)
@@ -32,7 +32,7 @@ earth = worlds.index('earth') #locate earth
 loc = earth #always start on earth
 # Choose 3 random worlds to have a shop for ship upgrades
 shops = [worlds.index(random.choice(worlds)) for i in range(30)]
-# Include Earth as a "ship upgrade planet"
+# Include Earth as a "ship upgrade planet
 shops.append(earth)
 
 
@@ -79,7 +79,7 @@ def showPrices():
     print()
 
 def storageSpace():
-    return (100 + 100 * upgrades.count('cargo')) * (1 + 0.2 * upgrades.count('expandedCargo'))
+    return int((100 + 100 * upgrades.count('cargo')) * (1 + 0.2 * upgrades.count('expandedCargo')))
 
 def buy():
     #global means to use the variables defined before the function in the function.
@@ -293,7 +293,7 @@ def randomEvents():
         storage = storageSpace()
         print("You found %i random %s floating in space!" %(quantity,item))
         if len(inv)+quantity > storage:
-            quantity = storage-len(inv)
+            quantity = int(storage-len(inv))
             print("However, your inventory is too full, so you could only collect %i." %(quantity))
         for i in range(quantity):
             inv.append(item)
@@ -302,7 +302,7 @@ def randomEvents():
         print("You got sucked into a wormhole,")
         loc = worlds.index(random.choice(worlds))
         #loc = random.randint(0,len(worlds)-1)
-        print("you have arrived at %s." %(worlds[loc].title()))
+        print("you have arrived at %s." %(worlds[loc]))
     elif event <= 0.15:
         #Distress signal
         distressSignal()
