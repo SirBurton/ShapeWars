@@ -58,16 +58,6 @@ items = ['triangles',
 default = [5,25,100,250,500,1000]
 prices = default[:]
 
-
-#Creating a function to make sure any inputs are numbers.
-#I take a lot of number inputs, so this will be helpful
-def numberInput(text=""):
-    cow = input(text)
-    while not cow.isdigit():
-        print("Please enter a number:")
-        cow = input(text)
-    return int(cow)
-
 def generatePrices():
     #randomly choose a price between 80% and 120% of the base price
     #0.4 is the spread, 120%-80%=40%  -->  40%=0.40
@@ -79,13 +69,7 @@ def generatePrices():
     for i in range(len(items)):
         newPrice = random.random()*default[i]*0.4 + default[i]*(0.8+0.01*(loc-earth))
         prices[i] = round(newPrice,2)
-'''
-def showPrices():
-    output = ''
-    for price in prices:
-        output += '$%7.2f\n\n' %(price)
-    return output[:-2]
-'''
+
 def storageSpace():
     return int((100 + 100 * upgrades.count('cargo')) * (1 + 0.2 * upgrades.count('expandedCargo')))
 
@@ -104,7 +88,6 @@ def buy(item):
     purchase = int(purchase)
     if purchase > limit:
         messagebox.showwarning(title="whoops",message="You cannot afford that many.")
-        print("You cannot afford that many.")
         return
     for i in range(purchase):
         inv.append(items[item])
@@ -126,8 +109,7 @@ def sell(item):
     if not sale: return
     sale=int(sale)
     if sale > inv.count(items[item]):
-        print("You don't have that many.")
-        time.sleep(1)
+        messagebox.showwarning(title="whoops",message="You don't have that many.")
         return
     for i in range(sale):
         inv.remove(items[item])
@@ -135,14 +117,6 @@ def sell(item):
     print("You sold %i %s for $%.2f monies." %(sale,items[item],prices[item]*sale))
     displayInvs[item].config(text=inv.count(items[item]))
 
-'''
-def view():
-    print('You currently have %.2f monies' %(monies))
-    text = ''
-    for item in items:
-        text += '%3i\n\n' %(inv.count(item))
-    return text[:-2]
-'''
 
 def upgrade():
     global monies
@@ -217,32 +191,40 @@ def upgrade():
     print()
 
 
-def travel():
-    global worlds, day
+def travelButtons(frame):
+    global worlds
+    # remove old buttons
+    olds = frame.slaves()
+    for old in olds:
+        old.destroy()
     travelDistance = 2 + upgrades.count('engine') - upgrades.count('brokenEngine')
-    if travelDistance <=0:
+    '''if travelDistance <=0:
         print("You are stuck here until you repair your engines.")
         print("You hail an emergency traveling merchant.")
         upgrade()
         day += 1
-        return loc
+        return loc'''
     lowWorld = max(0,loc-travelDistance)
     highWorld = min(len(worlds),loc+travelDistance+1)
     availableWorlds = worlds[lowWorld:highWorld]
-    print('Where would you like to go?')
+    print(availableWorlds)
+    offset = availableWorlds.index(worlds[loc])
+    buttons = []
     for i in range(len(availableWorlds)):
-        print('%2i) %s' %(i+1,availableWorlds[i].title()))
-    goto = input()
-    while goto.isdigit() == False or int(goto)-1 >= len(availableWorlds):
-        print('Please type the number of the planet:')
-        goto = input()
-    goto = availableWorlds[int(goto)-1]
-    print()
-    print('Traveling to %s...' %(goto.title()))
+        buttons.append(Button(frame, text=availableWorlds[i].title(),command=partial(travel,i-offset)))
+    for button in buttons:
+        button.pack(side=LEFT)
+
+def travel(where):
+    global loc, day
+    print(where)
+    loc += where
+    print('Traveling to %s...' %(worlds[loc].title()))
     print()
     day += 1
-    time.sleep(1)
-    return worlds.index(goto)
+    dayLabel.config(text='Day %i on %s' %(day,worlds[loc].title()))
+    travelButtons(travelFrame)
+    
 
 def menu():
     global loc, monies
@@ -552,7 +534,7 @@ while day <= 30:
         break
 '''
 dayLabel = Label(window,text='Day %i on %s' %(day,worlds[loc].title()))
-dayLabel.grid(row=0,column=2,columnspan=1)
+dayLabel.grid(row=1,column=2,columnspan=1)
 
 displayPrices = []
 buyButtons = []
@@ -562,15 +544,20 @@ displayInvs = []
 
 for i in range(len(items)):
     displayPrices = Label(window,text='$%.2f' %(prices[i]),font=textFont)
-    displayPrices.grid(row=i+1, column=0)
+    displayPrices.grid(row=i+2, column=0)
     buyButtons.append(Button(window,text="Buy",command=partial(buy,i)))
-    buyButtons[i].grid(row=i+1,column=1)
+    buyButtons[i].grid(row=i+2,column=1)
     shapeLabels.append(Label(window,text=items[i].title(), font=textFont))
-    shapeLabels[i].grid(row=i+1, column=2)
+    shapeLabels[i].grid(row=i+2, column=2)
     sellButtons.append(Button(window,text="Sell",command=partial(sell,i)))
-    sellButtons[i].grid(row=i+1,column=3)
+    sellButtons[i].grid(row=i+2,column=3)
     displayInvs.append(Label(window,text=inv.count(items[i]),font=textFont))
-    displayInvs[i].grid(row=i+1,column=4)
+    displayInvs[i].grid(row=i+2,column=4)
+
+travelFrame = Frame(window, bg='#222244')
+travelFrame.grid(row=len(items)+3,column=0, columnspan=6, sticky='we')
+travelButtons(travelFrame)
+
 
 
 window.mainloop()
