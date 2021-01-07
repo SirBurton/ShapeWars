@@ -69,6 +69,10 @@ def generatePrices():
     for i in range(len(items)):
         newPrice = random.random()*default[i]*0.4 + default[i]*(0.8+0.01*(loc-earth))
         prices[i] = round(newPrice,2)
+        displayPrices[i].config(text='$%.2f' %(prices[i]))
+
+def updateMoniesDisplay():
+    moneyLabel.config(text='You have $%.2f Monies' %(monies))
 
 def storageSpace():
     return int((100 + 100 * upgrades.count('cargo')) * (1 + 0.2 * upgrades.count('expandedCargo')))
@@ -100,11 +104,12 @@ def buy(item):
         random.shuffle(inv)
         inv = inv[0:storage]
     displayInvs[item].config(text=inv.count(items[item]))
+    updateMoniesDisplay()
 
 def sell(item):
     global monies,inv
     text1 = 'How many %s?' %(items[item])
-    text2 = 'How many %s would you like to sell?' %(items[item])
+    text2 = 'You have %i %s' %(inv.count(items[item]),items[item])
     sale = simpledialog.askinteger(title=text1, prompt=text2)
     if not sale: return
     sale=int(sale)
@@ -116,6 +121,7 @@ def sell(item):
         monies += prices[item]
     print("You sold %i %s for $%.2f monies." %(sale,items[item],prices[item]*sale))
     displayInvs[item].config(text=inv.count(items[item]))
+    updateMoniesDisplay()
 
 
 def upgrade():
@@ -217,43 +223,24 @@ def travelButtons(frame):
 
 def travel(where):
     global loc, day
-    print(where)
     loc += where
     print('Traveling to %s...' %(worlds[loc].title()))
-    print()
     day += 1
+    generatePrices()
+    #Initialize random events
     dayLabel.config(text='Day %i on %s' %(day,worlds[loc].title()))
     travelButtons(travelFrame)
     
 
 def menu():
-    global loc, monies
-    print(' 1) View Inventory')
-    print(' 2) Buy Shapes')
-    print(' 3) Sell Shapes')
+    
     if loc in shops:
         print(' 4) Ship upgrades')
     print(' 0) Leave %s' %(worlds[loc].title()))
 
-    option = numberInput()
-    print()
-    if option == 1:
-        view()
-    elif option == 2:
-        buy()
-    elif option == 3:
-        sell()
-    elif option == 0:
-        old = loc
-        loc = travel()
-        moniesHistory.append(monies)
-        invHistory.append(invValue())
-        if old != loc:
-            generatePrices()
-        else:
-            print("You wasted a day.")
-        randomEvents()  #Initiate possible random events
-    elif option == 4 and loc in shops:
+    
+    randomEvents()  #Initiate possible random events
+    if option == 4 and loc in shops:
         upgrade()
     elif option == 42:
         monies += 10000
@@ -535,6 +522,8 @@ while day <= 30:
 '''
 dayLabel = Label(window,text='Day %i on %s' %(day,worlds[loc].title()))
 dayLabel.grid(row=1,column=2,columnspan=1)
+moneyLabel = Label(window,text='You have $%.2f Monies' %(monies))
+moneyLabel.grid(row=2,column=2)
 
 displayPrices = []
 buyButtons = []
@@ -543,19 +532,19 @@ sellButtons = []
 displayInvs = []
 
 for i in range(len(items)):
-    displayPrices = Label(window,text='$%.2f' %(prices[i]),font=textFont)
-    displayPrices.grid(row=i+2, column=0)
+    displayPrices.append(Label(window,text='$%.2f' %(prices[i]),font=textFont))
+    displayPrices[i].grid(row=i+3, column=0)
     buyButtons.append(Button(window,text="Buy",command=partial(buy,i)))
-    buyButtons[i].grid(row=i+2,column=1)
+    buyButtons[i].grid(row=i+3,column=1)
     shapeLabels.append(Label(window,text=items[i].title(), font=textFont))
-    shapeLabels[i].grid(row=i+2, column=2)
+    shapeLabels[i].grid(row=i+3, column=2)
     sellButtons.append(Button(window,text="Sell",command=partial(sell,i)))
-    sellButtons[i].grid(row=i+2,column=3)
+    sellButtons[i].grid(row=i+3,column=3)
     displayInvs.append(Label(window,text=inv.count(items[i]),font=textFont))
-    displayInvs[i].grid(row=i+2,column=4)
+    displayInvs[i].grid(row=i+3,column=4)
 
 travelFrame = Frame(window, bg='#222244')
-travelFrame.grid(row=len(items)+3,column=0, columnspan=6, sticky='we')
+travelFrame.grid(row=len(items)+4,column=0, columnspan=6, sticky='we')
 travelButtons(travelFrame)
 
 
