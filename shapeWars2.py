@@ -1,7 +1,7 @@
 # January 2021
 # Sir Burton
 # Shapewars as a GUI?
-# v0.3.0
+# v0.3.2
 
 from tkinter import *
 from tkinter import simpledialog, messagebox
@@ -21,23 +21,22 @@ moniesHistory = []  #track the players worth over the game (for end game graph)
 invHistory = []     #track the value of their inventory
 
 #World stuff
-worlds = ['earth','pluto','saturn',
-          'forest moon of endor','alderaan','mustafar','hoth','dagobah','naboo','coruscant','tatooine','kashyyyk',
-          'pandora','vulcan','deep space 9','krypton','scadrial','reach','harvest','onyx',
-          'raxacoricofallapatorius','apalapucia',"demon's run",'skaro',
-          'gargantua','cooper station','miller','edmunds',
-          'gallifrey','sontar','trenzalore',
-          'typhon','terra 2','harmony','hollow bastion','nobook',
-          'ego','vormir','xandar','sakaar','asgard','nidavellir',
-          'lusitania','shakesphere','path',
-          'magrathea','betelgeuse v','vogsphere','damogran','sqornshellous zeta',
-          'irk','vort','blorch','foodcourtia','conventia',
-          'ludus','chthonia','frobozz']
+worlds = ['Earth','Pluto','Saturn',
+          'Forest Moon of Endor','Alderaan','Mustafar','Hoth','Dagobah','Naboo','Coruscant','Tatooine','Kashyyyk',
+          'Pandora','Vulcan','Deep Space 9','Krypton','Scadrial','Reach','Harvest','Onyx',
+          'Raxacoricofallapatorius','Apalapucia',"Demon's Run",'Skaro','Gallifrey','Sontar','Trenzalore',
+          'Gargantua','Cooper station','Miller','Edmunds',
+          'Typhon','Terra 2','Harmony','Hollow Bastion','Nobook',
+          'Ego','Vormir','Xandar','Sakaar','Asgard','Nidavellir',
+          'Lusitania','Shakesphere','Path',
+          'Magrathea','Betelgeuse V','Vogsphere','Damogran','Sqornshellous Zeta',
+          'Irk','Vort','Blorch','Foodcourtia','Conventia',
+          'Ludus','Chthonia','Frobozz']
 random.shuffle(worlds)  #shuffle the order of the worlds for each game
 day = 0
-earth = worlds.index('earth') #locate earth
+earth = worlds.index('Earth') #locate earth
 loc = earth #always start on earth
-# Choose 3 random worlds to have a shop for ship upgrades
+# Choose 30 ish random worlds to have a shop for ship upgrades
 shops = [worlds.index(random.choice(worlds)) for i in range(30)]
 # Include Earth as a "ship upgrade planet
 shops.append(earth)
@@ -96,7 +95,6 @@ def buy(item):
     for i in range(purchase):
         inv.append(items[item])
         monies -= prices[item]
-    print("You bought %i %s for $%.2f monies." %(purchase,items[item],prices[item]*purchase))
     if len(inv) > storage:
         text = "You cannot hold that many items."
         text += "\nYou randomly dropped %i shapes." %(len(inv)-storage)
@@ -119,15 +117,16 @@ def sell(item):
     for i in range(sale):
         inv.remove(items[item])
         monies += prices[item]
-    print("You sold %i %s for $%.2f monies." %(sale,items[item],prices[item]*sale))
     displayInvs[item].config(text=inv.count(items[item]))
     updateMoniesDisplay()
 
 
-def upgrade():
-    global monies
-    print("What would you like to upgrade?")
-    print("You have %.2f monies" %(monies))
+def upgradeBox():
+    box = Toplevel(window)
+    box.title("Upgrade Shop!")
+    Label(box, text='What would you like to upgrade?').grid(row=0, column=0, columnspan=5)
+    mon = Label(box, text="You have %.2f monies" %(monies))
+    mon.grid(row=1, column=0, columnspan=5)
     # Engines start at $500, and go up 4x the price each upgrade
     engine = 500 * (3 ** upgrades.count('engine'))
     if 'brokenEngine' in upgrades: engine = 250
@@ -148,53 +147,58 @@ def upgrade():
         shields *= priceScale
         weapons *= priceScale
     if 'brokenEngine' in upgrades:
-        print(" 1) Repair Engine \t$%.2f" %(engine))
+        button1 = Button(box,text="Repair Engine \n$%.2f" %(engine),command=partial(upgrade,1,engine,box), width=10)
     else:
-        print(" 1) Engine \t$%.2f" %(engine))
-    print(" 2) Cargo Bay \t$%.2f" %(storage))
-    print(" 3) Shields \t$%.2f" %(shields))
-    print(" 4) Weapons \t$%.2f" %(weapons))
-    print(" 0) Nevermind")
+        button1 = Button(box,text="Engine \n$%.2f" %(engine),command=partial(upgrade,1,engine,box), width=10)
+    button2 = Button(box,text="Cargo Bay \n$%.2f" %(storage),command=partial(upgrade,2,storage,box), width=10)
+    button3 = Button(box,text="Shields \n$%.2f" %(shields),command=partial(upgrade,3,shields,box), width=10)
+    button4 = Button(box,text="Weapons \n$%.2f" %(weapons),command=partial(upgrade,4,weapons,box), width=10)
+    button5 = Button(box,text="Leave\nShop", command=box.destroy, width=10)
+
+    button1.grid(row=3, column=0)
+    button2.grid(row=3, column=1)
+    button3.grid(row=3, column=2)
+    button4.grid(row=3, column=3)
+    button5.grid(row=3, column=4)
     
-    choice = numberInput()
+def upgrade(choice,cost,box):
+    global monies
     if choice == 1:
-        if monies >= engine:
+        if monies >= cost:
             if 'brokenEngine' in upgrades:
                 upgrades.remove('brokenEngine')
-                print("Engine repaired!")
+                messagebox.showinfo(message="Engine repaired!")
                 return
             upgrades.append('engine')
-            monies = monies - engine
-            print("Engine upgraded!")
+            monies = monies - cost
+            messagebox.showinfo(message="Engine upgraded to level %i!" %(upgrades.count('engine')+1),parent=window)
+            travelButtons(travelFrame)
         else:
-            print("You do not have enough monies.")
+           messagebox.showinfo(message="You do not have enough monies.")
     elif choice == 2:
-        if monies >= storage:
+        if monies >= cost:
             upgrades.append('cargo')
-            monies = monies - storage
-            print("Cargo Bay Expanded to %i!" %(storageSpace()))
+            monies = monies - cost
+            messagebox.showinfo(message="Cargo Bay Expanded to %i!" %(storageSpace()))
         else:
-            print("You do not have enough monies.")
+            messagebox.showinfo(message="You do not have enough monies.")
     elif choice == 3:
-        if monies >= shields:
+        if monies >= cost:
+            x = upgrades.count('shield')
             upgrades.append('shield')
-            monies = monies - shields
-            print("Shields are now %i%% effective!" %(x+1))
+            monies = monies - cost
+            messagebox.showinfo(message="Shields are now %i%% effective!" %(x+1))
         else:
-            print("You do not have enough monies.")
+            messagebox.showinfo(message="You do not have enough monies.")
     elif choice == 4:
-        if monies >= weapons:
+        if monies >= cost:
             upgrades.append('weapon')
-            monies = monies - weapons
-            print("You now have Level %i Weaponry!" %(upgrades.count('weapon')))
+            monies = monies - cost
+            messagebox.showinfo(message="You now have Level %i Weaponry!" %(upgrades.count('weapon')))
         else:
-            print("You do not have enough monies.")
-    elif choice == 0:
-        return
-    else:
-        print("Unknown command")
-    time.sleep(1)
-    print()
+            messagebox.showinfo(message="You do not have enough monies.")
+    box.destroy()
+    updateMoniesDisplay()
 
 
 def travelButtons(frame):
@@ -203,6 +207,12 @@ def travelButtons(frame):
     olds = frame.slaves()
     for old in olds:
         old.destroy()
+    if shops.count(loc):
+        upgradeButton.grid()
+    else: upgradeButton.grid_forget()
+    if day >= 30:  #game over
+        Label(frame,text="you have run out of day").pack()
+        return
     travelDistance = 2 + upgrades.count('engine') - upgrades.count('brokenEngine')
     '''if travelDistance <=0:
         print("You are stuck here until you repair your engines.")
@@ -213,44 +223,22 @@ def travelButtons(frame):
     lowWorld = max(0,loc-travelDistance)
     highWorld = min(len(worlds),loc+travelDistance+1)
     availableWorlds = worlds[lowWorld:highWorld]
-    print(availableWorlds)
     offset = availableWorlds.index(worlds[loc])
     buttons = []
     for i in range(len(availableWorlds)):
-        buttons.append(Button(frame, text=availableWorlds[i].title(),command=partial(travel,i-offset)))
+        buttons.append(Button(frame, text=availableWorlds[i],command=partial(travel,i-offset)))
     for button in buttons:
         button.pack(side=LEFT)
 
 def travel(where):
     global loc, day
     loc += where
-    print('Traveling to %s...' %(worlds[loc].title()))
     day += 1
     generatePrices()
-    #Initialize random events
-    dayLabel.config(text='Day %i on %s' %(day,worlds[loc].title()))
+    randomEvents()
+    dayLabel.config(text='Day %i on %s' %(day,worlds[loc]))
     travelButtons(travelFrame)
     
-
-def menu():
-    
-    if loc in shops:
-        print(' 4) Ship upgrades')
-    print(' 0) Leave %s' %(worlds[loc].title()))
-
-    
-    randomEvents()  #Initiate possible random events
-    if option == 4 and loc in shops:
-        upgrade()
-    elif option == 42:
-        monies += 10000
-    elif option == 333:
-        global day
-        day -= 10
-    else:
-        print("Unknown command")
-    return option
-
 
 def randomEvents():
     global prices, monies, inv, loc, worlds
@@ -261,45 +249,56 @@ def randomEvents():
         #find random items  (less when the item is more expensive)
         quantity = random.randint(1,(6-items.index(item))*3)
         storage = storageSpace()
-        print("You found %i random %s floating in space!" %(quantity,item))
+        text = "You found %i random %s floating in space!" %(quantity,item)
         if len(inv)+quantity > storage:
             quantity = int(storage-len(inv))
-            print("However, your inventory is too full, so you could only collect %i." %(quantity))
+            text += "\nHowever, your inventory is too full, so you could only collect %i." %(quantity)
         for i in range(quantity):
             inv.append(item)
-    elif event <= 0.11:
-        #Worm Hole
-        print("You got sucked into a wormhole,")
-        loc = worlds.index(random.choice(worlds))
-        #loc = random.randint(0,len(worlds)-1)
-        print("you have arrived at %s." %(worlds[loc]))
-    elif event <= 0.15:
-        #Distress signal
-        distressSignal()
+        messagebox.showinfo("Good news!",text)
+        displayInvs[items.index(item)].config(text=inv.count(item))
+    #elif event <= 0.11:
+    #    #Worm Hole
+    #    print("You got sucked into a wormhole,")
+    #    loc = worlds.index(random.choice(worlds))
+    #    #loc = random.randint(0,len(worlds)-1)
+    #    print("you have arrived at %s." %(worlds[loc]))
+    #elif event <= 0.15:
+    #    #Distress signal
+    #    distressSignal()
     #more common events down here
+    names = ['Bob Ross','John Cena','Steve','Denzel Washington','Edgar Allan Poe','Clint Eastwood',
+             'Leonardo da Vinci','Tom Cruise', 'Lady Gaga', 'Marilyn Monroe']
     elif event >= 0.8:
         #price drop
-        things = ["The %s miners worked extra hard" %(item),
-                  "The %s's government has subsidized the %s" %(worlds[loc].title(),item[:-1]),
-                  "%s says %s aren't cool" %(random.choice(['Bob Ross','John Cena','Steve']),item),
-                  "%s spotted on a stale meme" %(item[:-1].capitalize()),
-                  "For no reason at all"
+        things = ["The %s miners worked extra hard." %(item),
+                  "The %s's government has subsidized the %s." %(worlds[loc],item[:-1]),
+                  "%s says %s aren't cool." %(random.choice(names),item),
+                  "%s spotted on a stale meme." %(item[:-1].capitalize()),
+                  "For no reason at all."
                   ]
-        print("%s, %s price drops." %(random.choice(things),item))
+        messagebox.showinfo("%s price drops" %(item),random.choice(things))
         which = items.index(item)
         prices[which] = prices[which]/2
+        displayPrices[which].config(text='$%.2f' %(prices[which]))
     elif event >= 0.7:
         #price up
-        #add some random things that might increase the price
-        print("Thing happened, %s price increased." %(item))
+        things = ["The %s miners went on strike." %(item),
+                  "The %s's government has placed a tarrif on the %s" %(worlds[loc],item[:-1]),
+                  "%s says %s are super cool." %(random.choice(names),item),
+                  "%s spotted on a dank meme." %(item[:-1].capitalize()),
+                  "For some strange reason."
+                  ]
+        messagebox.showinfo("%s price incresed" %(item),random.choice(things))
         which = items.index(item)
         prices[which] *= 2
-    elif event >= 0.6:
+        displayPrices[which].config(text='$%.2f' %(prices[which]))
+    #elif event >= 0.6:
         #Space Pirates, give shapes or monies?
-        spacePirates()
-    elif event >= 0.5:
-        print("A traveling merchant offeres to work on your ship.")
-        upgrade()
+    #    spacePirates()
+    #elif event >= 0.5:
+    #    print("A traveling merchant offeres to work on your ship.")
+    #    upgrade()
     #add more events later
     #include at least one that give you things
 
@@ -508,19 +507,11 @@ def drawGraph(tall=10):
 
 '''
 while day <= 30:
-    print()
-    print('Day',day,'on',worlds[loc].title())
-    print('You have $%.2f monies.' %(monies))
-    print()
-    showPrices()
-    #time.sleep(1) 
-    #buy/sell stuff
-    option = menu()
     if hp <= 0:
         print("Your ship is damaged beyond repair.  You loose.")
         break
 '''
-dayLabel = Label(window,text='Day %i on %s' %(day,worlds[loc].title()))
+dayLabel = Label(window,text='Day %i on %s' %(day,worlds[loc])))
 dayLabel.grid(row=1,column=2,columnspan=1)
 moneyLabel = Label(window,text='You have $%.2f Monies' %(monies))
 moneyLabel.grid(row=2,column=2)
@@ -543,10 +534,11 @@ for i in range(len(items)):
     displayInvs.append(Label(window,text=inv.count(items[i]),font=textFont))
     displayInvs[i].grid(row=i+3,column=4)
 
+upgradeButton = Button(window,text="Upgrades", command=upgradeBox)
+upgradeButton.grid(row=len(items)+5, column=0)
+
 travelFrame = Frame(window, bg='#222244')
 travelFrame.grid(row=len(items)+4,column=0, columnspan=6, sticky='we')
 travelButtons(travelFrame)
-
-
 
 window.mainloop()
