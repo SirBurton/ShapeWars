@@ -1,7 +1,7 @@
 # January 2021
 # Sir Burton
 # Shapewars as a GUI?
-# v0.3.2
+# v0.3.3
 
 from tkinter import *
 from tkinter import simpledialog, messagebox
@@ -244,6 +244,8 @@ def randomEvents():
     global prices, monies, inv, loc, worlds
     event = random.random()
     item = random.choice(items)
+    names = ['Bob Ross','John Cena','Steve','Denzel Washington','Edgar Allan Poe','Clint Eastwood',
+             'Leonardo da Vinci','Tom Cruise', 'Lady Gaga', 'Marilyn Monroe']
     #rare events come first, the low end of the random
     if event <= 0.07:
         #find random items  (less when the item is more expensive)
@@ -267,8 +269,7 @@ def randomEvents():
     #    #Distress signal
     #    distressSignal()
     #more common events down here
-    names = ['Bob Ross','John Cena','Steve','Denzel Washington','Edgar Allan Poe','Clint Eastwood',
-             'Leonardo da Vinci','Tom Cruise', 'Lady Gaga', 'Marilyn Monroe']
+    
     elif event >= 0.8:
         #price drop
         things = ["The %s miners worked extra hard." %(item),
@@ -511,7 +512,7 @@ while day <= 30:
         print("Your ship is damaged beyond repair.  You loose.")
         break
 '''
-dayLabel = Label(window,text='Day %i on %s' %(day,worlds[loc])))
+dayLabel = Label(window,text='Day %i on %s' %(day,worlds[loc]))
 dayLabel.grid(row=1,column=2,columnspan=1)
 moneyLabel = Label(window,text='You have $%.2f Monies' %(monies))
 moneyLabel.grid(row=2,column=2)
