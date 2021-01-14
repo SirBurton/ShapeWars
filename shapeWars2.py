@@ -37,7 +37,7 @@ day = 0
 earth = worlds.index('Earth') #locate earth
 loc = earth #always start on earth
 # Choose 30 ish random worlds to have a shop for ship upgrades
-shops = [worlds.index(random.choice(worlds)) for i in range(30)]
+shops = [worlds.index(random.choice(worlds)) for i in range(40)]
 # Include Earth as a "ship upgrade planet
 shops.append(earth)
 
@@ -50,7 +50,7 @@ items = ['triangles',
          'trapezoids',
          'circles',
          'parallelograms',
-         'tetracontadigrams',
+         'tetracontadigrams'
          ]
 #Default prices of items for sale
 #This must have the same number of items as the items list has
@@ -128,7 +128,8 @@ def upgradeBox():
     mon = Label(box, text="You have %.2f monies" %(monies))
     mon.grid(row=1, column=0, columnspan=5)
     # Engines start at $500, and go up 4x the price each upgrade
-    engine = 500 * (3 ** upgrades.count('engine'))
+    currentEngine = upgrades.count('engine')
+    engine = 500 * (3 ** currentEngine)
     if 'brokenEngine' in upgrades: engine = 250
     # Storage always costs $1000
     storage = 1000
@@ -138,7 +139,8 @@ def upgradeBox():
     x = upgrades.count('shield')
     shields = 1000/(99-x) + 10*x
     # Weapons upgrade similar to engines, but steeper
-    weapons = 1000 * (5 ** upgrades.count('weapon'))
+    currentWeapons = upgrades.count('weapon')
+    weapons = 1000 * (5 ** currentWeapons)
     # If we are not on earth, alter the upgrade cost
     if loc != earth:
         priceScale = 2/max(shops.count(loc),1)
@@ -149,12 +151,21 @@ def upgradeBox():
     if 'brokenEngine' in upgrades:
         button1 = Button(box,text="Repair Engine \n$%.2f" %(engine),command=partial(upgrade,1,engine,box), width=10)
     else:
-        button1 = Button(box,text="Engine \n$%.2f" %(engine),command=partial(upgrade,1,engine,box), width=10)
-    button2 = Button(box,text="Cargo Bay \n$%.2f" %(storage),command=partial(upgrade,2,storage,box), width=10)
-    button3 = Button(box,text="Shields \n$%.2f" %(shields),command=partial(upgrade,3,shields,box), width=10)
-    button4 = Button(box,text="Weapons \n$%.2f" %(weapons),command=partial(upgrade,4,weapons,box), width=10)
-    button5 = Button(box,text="Leave\nShop", command=box.destroy, width=10)
+        button1 = Button(box,text="Engine\n%s\n$%.2f" %('Level '+ str(currentEngine+1),engine),command=partial(upgrade,1,engine,box), width=10)
+    button2 = Button(box,text="Cargo Bay\n%s\n$%.2f" %('Capacity '+str(storageSpace()+100),storage),command=partial(upgrade,2,storage,box), width=10)
+    button3 = Button(box,text="Shields\n%s\n$%.2f" %(str(x+1)+'% effective',shields),command=partial(upgrade,3,shields,box), width=10)
+    button4 = Button(box,text="Weapons\n%s\n$%.2f" %('Level '+ str(currentWeapons+1),weapons),command=partial(upgrade,4,weapons,box), width=10)
+    button5 = Button(box,text="Leave\nShop", command=box.destroy, width=10, height=3)
 
+    if engine > monies:
+        button1.config(fg='grey')
+    if storage > monies:
+        button2.config(fg='grey')
+    if shields > monies:
+        button3.config(fg='grey')
+    if weapons > monies:
+        button4.config(fg='grey')
+    
     button1.grid(row=3, column=0)
     button2.grid(row=3, column=1)
     button3.grid(row=3, column=2)
@@ -208,7 +219,7 @@ def travelButtons(frame):
     for old in olds:
         old.destroy()
     if shops.count(loc):
-        upgradeButton.grid()
+        upgradeButton.grid(columnspan=6, sticky='we')
     else: upgradeButton.grid_forget()
     if day >= 30:  #game over
         Label(frame,text="you have run out of day").pack()
@@ -276,7 +287,7 @@ def randomEvents():
                   "The %s's government has subsidized the %s." %(worlds[loc],item[:-1]),
                   "%s says %s aren't cool." %(random.choice(names),item),
                   "%s spotted on a stale meme." %(item[:-1].capitalize()),
-                  "For no reason at all."
+                  "%s price drops for no reason at all." %(item.capitalize()),
                   ]
         messagebox.showinfo("%s price drops" %(item),random.choice(things))
         which = items.index(item)
@@ -288,7 +299,8 @@ def randomEvents():
                   "The %s's government has placed a tarrif on the %s" %(worlds[loc],item[:-1]),
                   "%s says %s are super cool." %(random.choice(names),item),
                   "%s spotted on a dank meme." %(item[:-1].capitalize()),
-                  "For some strange reason."
+                  "%s price jumps for some strange reason." %(item.capitalize()),
+                  "%s was seen wearing %s on their %s." %(random.choice(names),item,random.choice(['head','shirt','shoes','earrings','jacket','belly','face','legs']))
                   ]
         messagebox.showinfo("%s price incresed" %(item),random.choice(things))
         which = items.index(item)
@@ -535,10 +547,13 @@ for i in range(len(items)):
     displayInvs.append(Label(window,text=inv.count(items[i]),font=textFont))
     displayInvs[i].grid(row=i+3,column=4)
 
-upgradeButton = Button(window,text="Upgrades", command=upgradeBox)
-upgradeButton.grid(row=len(items)+5, column=0)
+blankGap = Canvas(window, height=15)
+blankGap.grid(row=len(items)+3, column=0, columnspan=6)
 
-travelFrame = Frame(window, bg='#222244')
+upgradeButton = Button(window,text="Upgrades", command=upgradeBox)
+upgradeButton.grid(row=len(items)+5, column=0, columnspan=6, sticky='we')
+
+travelFrame = Frame(window, bg='#222255')
 travelFrame.grid(row=len(items)+4,column=0, columnspan=6, sticky='we')
 travelButtons(travelFrame)
 
