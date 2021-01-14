@@ -1,7 +1,7 @@
 # January 2021
 # Sir Burton
 # Shapewars as a GUI?
-# v0.3.3
+# v0.3.4
 
 from tkinter import *
 from tkinter import simpledialog, messagebox
@@ -101,6 +101,7 @@ def buy(item):
         messagebox.showerror(title="Oops.",message=text)
         random.shuffle(inv)
         inv = inv[0:storage]
+        #TODO:  update inventory display
     displayInvs[item].config(text=inv.count(items[item]))
     updateMoniesDisplay()
 
@@ -149,7 +150,7 @@ def upgradeBox():
         shields *= priceScale
         weapons *= priceScale
     if 'brokenEngine' in upgrades:
-        button1 = Button(box,text="Repair Engine \n$%.2f" %(engine),command=partial(upgrade,1,engine,box), width=10)
+        button1 = Button(box,text="Repair Engine \n$%.2f" %(engine),command=partial(upgrade,1,engine,box), width=10, height=3)
     else:
         button1 = Button(box,text="Engine\n%s\n$%.2f" %('Level '+ str(currentEngine+1),engine),command=partial(upgrade,1,engine,box), width=10)
     button2 = Button(box,text="Cargo Bay\n%s\n$%.2f" %('Capacity '+str(storageSpace()+100),storage),command=partial(upgrade,2,storage,box), width=10)
@@ -315,6 +316,7 @@ def randomEvents():
     #add more events later
     #include at least one that give you things
 
+#TODO add distress signal event to GUI
 def distressSignal():
     print("You received a distress signal.")
     print(" 1) Follow it")
@@ -374,7 +376,7 @@ def distressSignal():
         print("You ignore the distress signal.")
         print("Hopefully they will be ok.")
 
-
+#TODO add spacePirates event to GUI
 def spacePirates():
     global monies, inv, hp
     print("Space Pirates attack you!")
@@ -494,6 +496,7 @@ def invValue():
 
 
 #Draw a text based graph of your monies history
+#TODO add graph to GUI
 def drawGraph(tall=10):
     liquid = [moniesHistory[i] + invHistory[i] for i in range(len(invHistory))]
     row = [' ']*33
@@ -518,12 +521,8 @@ def drawGraph(tall=10):
     for row in graph:
         print(''.join(row))
 
-'''
-while day <= 30:
-    if hp <= 0:
-        print("Your ship is damaged beyond repair.  You loose.")
-        break
-'''
+#GUI buttons and layouts begin here
+
 dayLabel = Label(window,text='Day %i on %s' %(day,worlds[loc]))
 dayLabel.grid(row=1,column=2,columnspan=1)
 moneyLabel = Label(window,text='You have $%.2f Monies' %(monies))
