@@ -1,7 +1,7 @@
 # January 2021
 # Sir Burton
 # Shapewars as a GUI?
-# v0.3.4
+# v0.3.5
 
 from tkinter import *
 from tkinter import simpledialog, messagebox
@@ -37,8 +37,8 @@ day = 0
 earth = worlds.index('Earth') #locate earth
 loc = earth #always start on earth
 # Choose 30 ish random worlds to have a shop for ship upgrades
-shops = [worlds.index(random.choice(worlds)) for i in range(40)]
-# Include Earth as a "ship upgrade planet
+shops = [worlds.index(random.choice(worlds)) for i in range(50)]
+# Include Earth as a "ship upgrade" planet
 shops.append(earth)
 
 
@@ -71,7 +71,7 @@ def generatePrices():
         displayPrices[i].config(text='$%.2f' %(prices[i]))
 
 def updateMoniesDisplay():
-    moneyLabel.config(text='You have $%.2f Monies' %(monies))
+    moneyLabel.config(text='You have $%s Monies' %(f"{monies:,.2f}"))
 
 def storageSpace():
     return int((100 + 100 * upgrades.count('cargo')) * (1 + 0.2 * upgrades.count('expandedCargo')))
@@ -124,6 +124,7 @@ def sell(item):
 
 def upgradeBox():
     box = Toplevel(window)
+    box.grab_set()
     box.title("Upgrade Shop!")
     Label(box, text='What would you like to upgrade?').grid(row=0, column=0, columnspan=5)
     mon = Label(box, text="You have %.2f monies" %(monies))
@@ -383,21 +384,21 @@ def spacePirates():
     if  upgrades.count('shield') > random.randint(0,100):
         print("Your shields held them off.  You are safe for now.")
         return
-    print("The Space Pirates demand 1/4 of your shapes, or 1/4 of your monies.")
+    print("The Space Pirates demand 1/2 of your shapes, or 1/2 of your monies.")
     print("Give them:")
-    print(" 1) $%.2f" %(monies/4))
-    print(" 2) %i random shapes" %(len(inv)//4))
+    print(" 1) $%.2f" %(monies/2))
+    print(" 2) %i random shapes" %(len(inv)//2))
     print(" 3) Fight back!")
     print(" 4) Run away!")
     choice = numberInput()
     if choice == 1:
         print("You sigh and hand over the monies.")
-        monies -= monies/4
+        monies -= monies/2
     elif choice == 2:
         print("You open the doors to your cargo bay.")
         random.shuffle(inv)  #Shuffle your carago
-        pirates = inv[:len(inv)//4] #pirates get the first half
-        inv = inv[len(inv)//4:] #You get the second half
+        pirates = inv[:len(inv)//2] #pirates get the first half
+        inv = inv[len(inv)//2:] #You get the second half
         #show what they took
         print("They took")
         for item in items:
@@ -413,9 +414,10 @@ def spacePirates():
             monies += winnings
             return
         else:
-            print("They take half of your inventory for trying.")
+            print("They take half of your inventory AND monies for trying.")
             pirates = inv[:len(inv)//2] #pirates get the first half
             inv = inv[len(inv)//2:] #You get the second half
+            monies -= monies/2
             #show what they took
             print("They took")
             for item in items:
