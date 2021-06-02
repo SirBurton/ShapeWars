@@ -1,7 +1,7 @@
 # January 2021
 # Sir Burton
 # Shapewars as a GUI?
-# v0.3.5
+# v0.3.6
 
 from tkinter import *
 from tkinter import simpledialog, messagebox
@@ -31,7 +31,7 @@ worlds = ['Earth','Pluto','Saturn',
           'Lusitania','Shakesphere','Path',
           'Magrathea','Betelgeuse V','Vogsphere','Damogran','Sqornshellous Zeta',
           'Irk','Vort','Blorch','Foodcourtia','Conventia',
-          'Ludus','Chthonia','Frobozz']
+          'Ludus','Chthonia','Frobozz','Feebla-Oot','Vroblok Cluster',"Meap's Planet"]
 random.shuffle(worlds)  #shuffle the order of the worlds for each game
 day = 0
 earth = worlds.index('Earth') #locate earth
@@ -101,7 +101,6 @@ def buy(item):
         messagebox.showerror(title="Oops.",message=text)
         random.shuffle(inv)
         inv = inv[0:storage]
-        #TODO:  update inventory display
     displayInvs[item].config(text=inv.count(items[item]))
     updateMoniesDisplay()
 
@@ -257,8 +256,10 @@ def randomEvents():
     global prices, monies, inv, loc, worlds
     event = random.random()
     item = random.choice(items)
-    names = ['Bob Ross','John Cena','Steve','Denzel Washington','Edgar Allan Poe','Clint Eastwood',
-             'Leonardo da Vinci','Tom Cruise', 'Lady Gaga', 'Marilyn Monroe']
+    names = ['Bob Ross','John Cena','Steve','Denzel Washington',
+             'Edgar Allan Poe','Clint Eastwood',
+             'Leonardo da Vinci','Tom Cruise',
+             'Lady Gaga', 'Marilyn Monroe']
     #rare events come first, the low end of the random
     if event <= 0.07:
         #find random items  (less when the item is more expensive)
